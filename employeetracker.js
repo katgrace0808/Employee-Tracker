@@ -46,12 +46,14 @@ function runSearch() {
                 case 'View roles':
                     roleList();
                     break;
-                case 'Quit':
-                    connection.end();
                 case 'Add employee':
                     employeeAdd();
+                    break;
                 case 'Add department':
                     departmentAdd();
+                    break;
+                case 'Quit':
+                    connection.end();
             }
         });
 }
@@ -110,7 +112,7 @@ function employeeAdd() {
         .then(function (answer) {
             // let query = "INSERT INTO employee VALUES (?,?,?,?,?)";
             // connection.query(query, data, function (err, res) {
-                console.log(answer);
+            console.log(answer);
             // })
         })
 }
