@@ -48,6 +48,10 @@ function runSearch() {
                     break;
                 case 'Quit':
                     connection.end();
+                case 'Add employee':
+                    employeeAdd();
+                case 'Add department':
+                    departmentAdd();
             }
         });
 }
@@ -78,7 +82,7 @@ function roleList() {
 
 function employeeAdd() {
     inquirer
-        .prompt({
+        .prompt([{
             name: 'employee_id_add',
             type: 'input',
             message: 'What is the ID for the employee?'
@@ -102,11 +106,34 @@ function employeeAdd() {
             name: 'employee_manager_add',
             type: 'input',
             message: 'Who is their manager?'
+        }])
+        .then(function (answer) {
+            // let query = "INSERT INTO employee VALUES (?,?,?,?,?)";
+            // connection.query(query, data, function (err, res) {
+                console.log(answer);
+            // })
         })
-        .then(function(answer) {
-            let query = "SELECT * FORM employee";
-            connection.query(query, data, function(err, res) {
-                console.log(res);
+}
+
+function departmentAdd() {
+    inquirer
+        .prompt([{
+            name: 'department_id',
+            type: 'input',
+            message: 'What is the department ID?'
+        },
+        {
+            name: 'name',
+            type: 'input',
+            message: 'What is the department name?'
+        }])
+        .then(function (answer) {
+            let id = answer.department_id;
+            let name = answer.name;
+            let query = "INSERT INTO department VALUES (?,?)";
+            connection.query(query, [id, name], function (err, res) {
+                if (err) throw err;
+                runSearch();
             })
         })
 }
