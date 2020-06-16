@@ -4,7 +4,20 @@ const Department = require('./lib/Department');
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 
+
+let employeeArr = [];
+let roleArr = [];
+let departmentArr = [];
+
 let connection = mysql.createConnection({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: 'Riley2016!',
+    database: 'employee_trackerDB'
+});
+
+let connectionTwo = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
@@ -52,6 +65,9 @@ function runSearch() {
                 case 'Add department':
                     departmentAdd();
                     break;
+                case 'Add role':
+                    roleAdd();
+                    break;
                 case 'Quit':
                     connection.end();
             }
@@ -83,6 +99,18 @@ function roleList() {
 }
 
 function employeeAdd() {
+    connection.query("SELECT first_name, last_name FROM employee", function (err, res) {
+        for (let i = 0; i < res.length; i++) {
+            let employeeList = res[i].first_name + ' ' + res[i].last_name;
+            employeeArr.push(employeeList);
+        }
+    })
+    connectionTwo.query("SELECT title FROM role", function (err, res) {
+        for (let i = 0; i < res.length; i++) {
+            let roleList = res[i].title;
+            roleArr.push(roleList);
+        }
+    })
     inquirer
         .prompt([{
             name: 'employee_id_add',
@@ -101,19 +129,23 @@ function employeeAdd() {
         },
         {
             name: 'employee_role_add',
-            type: 'input',
-            message: 'What is their role?'
+            type: 'list',
+            message: 'What is their role?',
+            choices: roleArr
         },
         {
             name: 'employee_manager_add',
-            type: 'input',
-            message: 'Who is their manager?'
-        }])
+            type: 'list',
+            message: 'Who is their manager?',
+            choices: employeeArr
+        }
+        ])
         .then(function (answer) {
-            // let query = "INSERT INTO employee VALUES (?,?,?,?,?)";
-            // connection.query(query, data, function (err, res) {
-            console.log(answer);
-            // })
+            connection.query("SELECT first_name, last_name FROM employee", function (err, res) {
+                if (err) throw err;
+                console.log(answer);
+                runSearch();
+            })
         })
 }
 
@@ -139,3 +171,42 @@ function departmentAdd() {
             })
         })
 }
+
+function roleAdd() {
+    connectionTwo.query("SELECT name FROM department", function (err, res) {
+        for (let i = 0; i < res.length; i++) {
+            let departmentList = res[i].name;
+            departmentArr.push(departmentList);
+        }
+    })
+    inquirer
+        .prompt([{
+            name: 'role_id_add',
+            type: 'input',
+            message: 'What is the ID for the role?'
+        },
+        {
+            name: 'role_title_add',
+            type: 'input',
+            message: 'What is title of the role?'
+        },
+        {
+            name: 'role_salary_add',
+            type: 'input',
+            message: 'What is the role salary?'
+        },
+        {
+            name: 'role_department_add',
+            type: 'list',
+            message: 'What department should this role be applied?',
+            choices: departmentArr
+        }
+        ])
+        .then(function (answer) {
+            connection.query("SELECT first_name, last_name FROM employee", function (err, res) {
+                if (err) throw err;
+                console.log(answer);
+                runSearch();
+            })
+        })
+    }
