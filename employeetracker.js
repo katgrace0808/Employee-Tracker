@@ -141,11 +141,34 @@ function employeeAdd() {
         }
         ])
         .then(function (answer) {
-            connection.query("SELECT first_name, last_name FROM employee", function (err, res) {
-                if (err) throw err;
-                console.log(answer);
-                runSearch();
+            let queryRole = "SELECT role_id FROM role WHERE ?";
+            connection.query(queryRole, { title: answer.employee_role_add }, function (err, res) {
+                for (let i = 0; i < res.length; i++) {
+                    console.log(res[i].role_id);
+                    return res[i].role_id;
+                }
+                connection.end();
             })
+            let manager = answer.employee_manager_add.split(' ').slice(1);
+            let queryManager = "SELECT manager_id FROM employee WHERE ?"
+            connectionTwo.query(queryManager, { last_name: manager }, function (err, res) {
+                for (let i = 0; i < res.length; i++) {
+
+                    console.log(res[i].manager_id);
+                    return res[i].manager_id;
+                }
+                connection.end();
+            })
+            let id = answer.employee_id_add;
+            let firstName = answer.employee_first_name_add;
+            let lastName = answer.employee_last_name_add;
+            // let roleId = res[i].role_id;
+            // let managerId = res[i].manager_id;
+            let query = "INSERT INTO department VALUES (?,?,?,?,?)";
+            connection.query(query, [id, firstName, lastName, res[i].role_id, res[i].manager_id], function (err, res) {
+                if (err) throw err;
+                runSearch();
+            });
         })
 }
 
@@ -209,4 +232,4 @@ function roleAdd() {
                 runSearch();
             })
         })
-    }
+}
