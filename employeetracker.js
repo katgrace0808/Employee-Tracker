@@ -3,7 +3,7 @@ const Role = require('./lib/Role');
 const Department = require('./lib/Department');
 const inquirer = require('inquirer');
 const mysql = require('mysql');
-
+require('dotenv').config();
 
 let employeeArr = [];
 let roleArr = [];
@@ -13,7 +13,7 @@ let connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'Riley2016!',
+    password: DB_PASSWORD,
     database: 'employee_trackerDB'
 });
 
@@ -21,7 +21,7 @@ let connectionTwo = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'Riley2016!',
+    password: DB_PASSWORD,
     database: 'employee_trackerDB'
 });
 
@@ -142,6 +142,7 @@ function employeeAdd() {
         ])
         .then(function (answer) {
             let queryRole = "SELECT role_id FROM role WHERE ?";
+            console.log(answer);
             connection.query(queryRole, { title: answer.employee_role_add }, function (err, res) {
                 for (let i = 0; i < res.length; i++) {
                     console.log(res[i].role_id);
@@ -150,14 +151,17 @@ function employeeAdd() {
                 connection.end();
             })
             let manager = answer.employee_manager_add.split(' ').slice(1);
-            let queryManager = "SELECT manager_id FROM employee WHERE ?"
+            let queryManager = "SELECT employee_id FROM employee WHERE ?"
+            console.log(manager);
             connectionTwo.query(queryManager, { last_name: manager }, function (err, res) {
+                // console.log(last_name);
                 for (let i = 0; i < res.length; i++) {
 
                     console.log(res[i].manager_id);
                     return res[i].manager_id;
                 }
                 connection.end();
+
             })
             let id = answer.employee_id_add;
             let firstName = answer.employee_first_name_add;
@@ -170,6 +174,18 @@ function employeeAdd() {
                 runSearch();
             });
         })
+}
+
+function getRoleId() {
+    let queryRole = "SELECT role_id FROM role WHERE ?";
+    connection.query(queryRole, { title: answer.employee_role_add }, function (err, res) {
+        for (let i = 0; i < res.length; i++) {
+            console.log(res[i].role_id);
+            // return res[i].role_id;
+        }
+        connection.end();
+    })
+
 }
 
 function departmentAdd() {
