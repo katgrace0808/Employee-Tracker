@@ -13,7 +13,7 @@ let connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: DB_PASSWORD,
+    password: process.env.DB_PASSWORD,
     database: 'employee_trackerDB'
 });
 
@@ -21,7 +21,7 @@ let connectionTwo = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: DB_PASSWORD,
+    password: process.env.DB_PASSWORD,
     database: 'employee_trackerDB'
 });
 
@@ -99,15 +99,15 @@ function roleList() {
 }
 
 function employeeAdd() {
-    connection.query("SELECT first_name, last_name FROM employee", function (err, res) {
+    connection.query("SELECT employee_id, first_name, last_name FROM employee", function (err, res) {
         for (let i = 0; i < res.length; i++) {
-            let employeeList = res[i].first_name + ' ' + res[i].last_name;
+            let employeeList = res[i].employee_id + ' ' + res[i].first_name + ' ' + res[i].last_name;
             employeeArr.push(employeeList);
         }
     })
-    connectionTwo.query("SELECT title FROM role", function (err, res) {
+    connectionTwo.query("SELECT role_id, title FROM role", function (err, res) {
         for (let i = 0; i < res.length; i++) {
-            let roleList = res[i].title;
+            let roleList = res[i].role_id + ' ' + res[i].title;
             roleArr.push(roleList);
         }
     })
@@ -140,53 +140,51 @@ function employeeAdd() {
             choices: employeeArr
         }
         ])
-        .then(function (answer) {
-            let queryRole = "SELECT role_id FROM role WHERE ?";
-            console.log(answer);
-            connection.query(queryRole, { title: answer.employee_role_add }, function (err, res) {
-                for (let i = 0; i < res.length; i++) {
-                    console.log(res[i].role_id);
-                    return res[i].role_id;
-                }
-                connection.end();
-            })
-            let manager = answer.employee_manager_add.split(' ').slice(1);
-            let queryManager = "SELECT employee_id FROM employee WHERE ?"
-            console.log(manager);
-            connectionTwo.query(queryManager, { last_name: manager }, function (err, res) {
-                // console.log(last_name);
-                for (let i = 0; i < res.length; i++) {
+        .then(async function (answer) {
+            // getRoleId();
+            // let queryRole = "SELECT role_id FROM role WHERE ?";
+            // connection.query(queryRole, { title: answer.employee_role_add }, function (err, res) {
+            //     for (let i = 0; i < res.length; i++) {
+            //         console.log(res[i].role_id);
+            //         return res[i].role_id;
+            //     }
+            // })
+            // // connection.end();
 
-                    console.log(res[i].manager_id);
-                    return res[i].manager_id;
-                }
-                connection.end();
-
-            })
+            // let queryManager = "SELECT manager_id FROM employee INNER JOIN employee ON (manager_id) WHERE (last_name = answer.employee_manager_add.split(' ').slice(1)";
+            // connectionTwo.query(queryManager, [answer.employee_manager_add.split(' ').slice(1)], function (err, res) {
+            //     console.log(answer.employee_manager_add.split(' ').slice(1));
+            //     // return manager_id;
+            // })
+            // connection.end();
             let id = answer.employee_id_add;
             let firstName = answer.employee_first_name_add;
             let lastName = answer.employee_last_name_add;
+            let roleId = answer.employee_role_add.split(' ').slice(0,1);
+            let managerId = answer.employee_manager_add.split(' ').slice(0,1);
+            console.log(roleId);
+            console.log(managerId);
             // let roleId = res[i].role_id;
             // let managerId = res[i].manager_id;
-            let query = "INSERT INTO department VALUES (?,?,?,?,?)";
-            connection.query(query, [id, firstName, lastName, res[i].role_id, res[i].manager_id], function (err, res) {
+            let query = "INSERT INTO employee VALUES (?,?,?,?,?)";
+            connection.query(query, [id, firstName, lastName, roleId, managerId], function (err, res) {
                 if (err) throw err;
                 runSearch();
             });
         })
 }
 
-function getRoleId() {
-    let queryRole = "SELECT role_id FROM role WHERE ?";
-    connection.query(queryRole, { title: answer.employee_role_add }, function (err, res) {
-        for (let i = 0; i < res.length; i++) {
-            console.log(res[i].role_id);
-            // return res[i].role_id;
-        }
-        connection.end();
-    })
+// function getRoleId() {
+//     let queryRole = "SELECT role_id FROM role WHERE ?";
+//     connection.query(queryRole, { title: answer.employee_role_add }, function (err, res) {
+//         for (let i = 0; i < res.length; i++) {
+//             console.log(res[i].role_id);
+//             return res[i].role_id;
+//         }
+//         connection.end();
+//     })
 
-}
+// }
 
 function departmentAdd() {
     inquirer
