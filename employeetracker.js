@@ -68,6 +68,9 @@ function runSearch() {
                 case 'Add role':
                     roleAdd();
                     break;
+                case 'Update employee role':
+                    updateEmployeeRole();
+                    break;
                 case 'Quit':
                     connection.end();
             }
@@ -140,32 +143,14 @@ function employeeAdd() {
             choices: employeeArr
         }
         ])
-        .then(async function (answer) {
-            // getRoleId();
-            // let queryRole = "SELECT role_id FROM role WHERE ?";
-            // connection.query(queryRole, { title: answer.employee_role_add }, function (err, res) {
-            //     for (let i = 0; i < res.length; i++) {
-            //         console.log(res[i].role_id);
-            //         return res[i].role_id;
-            //     }
-            // })
-            // // connection.end();
-
-            // let queryManager = "SELECT manager_id FROM employee INNER JOIN employee ON (manager_id) WHERE (last_name = answer.employee_manager_add.split(' ').slice(1)";
-            // connectionTwo.query(queryManager, [answer.employee_manager_add.split(' ').slice(1)], function (err, res) {
-            //     console.log(answer.employee_manager_add.split(' ').slice(1));
-            //     // return manager_id;
-            // })
-            // connection.end();
+        .then(function (answer) {
             let id = answer.employee_id_add;
             let firstName = answer.employee_first_name_add;
             let lastName = answer.employee_last_name_add;
-            let roleId = answer.employee_role_add.split(' ').slice(0,1);
-            let managerId = answer.employee_manager_add.split(' ').slice(0,1);
-            console.log(roleId);
-            console.log(managerId);
-            // let roleId = res[i].role_id;
-            // let managerId = res[i].manager_id;
+            let roleId = answer.employee_role_add.split(' ').slice(0, 1);
+            let managerId = answer.employee_manager_add.split(' ').slice(0, 1);
+            // console.log(roleId);
+            // console.log(managerId);
             let query = "INSERT INTO employee VALUES (?,?,?,?,?)";
             connection.query(query, [id, firstName, lastName, roleId, managerId], function (err, res) {
                 if (err) throw err;
@@ -173,18 +158,6 @@ function employeeAdd() {
             });
         })
 }
-
-// function getRoleId() {
-//     let queryRole = "SELECT role_id FROM role WHERE ?";
-//     connection.query(queryRole, { title: answer.employee_role_add }, function (err, res) {
-//         for (let i = 0; i < res.length; i++) {
-//             console.log(res[i].role_id);
-//             return res[i].role_id;
-//         }
-//         connection.end();
-//     })
-
-// }
 
 function departmentAdd() {
     inquirer
@@ -210,9 +183,9 @@ function departmentAdd() {
 }
 
 function roleAdd() {
-    connectionTwo.query("SELECT name FROM department", function (err, res) {
+    connection.query("SELECT department_id, name FROM department", function (err, res) {
         for (let i = 0; i < res.length; i++) {
-            let departmentList = res[i].name;
+            let departmentList = res[i].department_id + ' ' + res[i].name;
             departmentArr.push(departmentList);
         }
     })
@@ -240,10 +213,36 @@ function roleAdd() {
         }
         ])
         .then(function (answer) {
-            connection.query("SELECT first_name, last_name FROM employee", function (err, res) {
+            let roleId = answer.role_id_add;
+            let title = answer.role_title_add;
+            let salary = answer.role_salary_add;
+            let departmentId = answer.role_department_add.split(' ').slice(0, 1);
+            let query = "INSERT INTO role VALUES (?,?,?,?)"
+            connection.query(query, [roleId, title, salary, departmentId], function (err, res) {
                 if (err) throw err;
                 console.log(answer);
                 runSearch();
             })
         })
+}
+
+function updateEmployeeRole() {
+    inquirer
+        .prompt([{
+            name: 'employee_role_update',
+            type: 'list',
+            message: 'Whose role do you wish to update?',
+            choices: employeeArr
+        },
+        {
+            name: 'employee_role_change',
+            type: 'list',
+            message: 'What is their new role?',
+            choices: roleArr
+        }
+    ])
+    .then(function(err, res) {
+        let employee = answer.employee_role_update;
+        console.log(employee);
+    })
 }

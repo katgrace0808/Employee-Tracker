@@ -28,6 +28,3 @@ VALUES (5698, 'IT Services'), (6457, 'Accounting'), (4897, 'Administration'), (3
 
 
 
-// department_id = 4
-// role_id = 2
-// employee_id = 6
