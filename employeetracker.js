@@ -5,8 +5,6 @@ require('dotenv').config();
 let employeeArr = [];
 let roleArr = [];
 let departmentArr = [];
-let employeeArrTwo = [];
-let roleArrTwo = [];
 
 let connection = mysql.createConnection({
     host: 'localhost',
@@ -50,7 +48,6 @@ function runSearch() {
             ]
         })
         .then(function (answer) {
-            console.log(answer);
             switch (answer.action) {
                 case 'View employee list':
                     employeeList();
@@ -161,8 +158,6 @@ function employeeAdd() {
             let lastName = answer.employee_last_name_add;
             let roleId = answer.employee_role_add.split(' ').slice(0, 1);
             let managerId = answer.employee_manager_add.split(' ').slice(0, 1);
-            // console.log(roleId);
-            // console.log(managerId);
             let query = "INSERT INTO employee VALUES (?,?,?,?,?)";
             connection.query(query, [id, firstName, lastName, roleId, managerId], function (err, res) {
                 if (err) throw err;
@@ -234,7 +229,6 @@ function roleAdd() {
             let query = "INSERT INTO role VALUES (?,?,?,?)"
             connection.query(query, [roleId, title, salary, departmentId], function (err, res) {
                 if (err) throw err;
-                console.log(answer);
                 runSearch();
             })
         })
@@ -275,7 +269,6 @@ function updateEmployeeRole() {
         ])
         .then(function (answer) {
             let employeeToChange = answer.employee_role_update.split(' ').slice(0, 1);
-            console.log(employeeToChange)
             let newRole = answer.employee_role_change.split(' ').slice(0, 1);
             let query = "UPDATE employee SET ? WHERE ?";
             connection.query(query, [{role_id: newRole}, {employee_id: employeeToChange}], function (err, res) {
@@ -311,7 +304,6 @@ function deleteDepartment() {
             let query = "DELETE FROM department WHERE ?"
             connection.query(query, {department_id: departmentId}, function (err, res) {
                 if (err) throw err;
-                console.log(answer);
                 runSearch();
             })
         })
@@ -343,7 +335,6 @@ function deleteRole() {
             let query = "DELETE FROM role WHERE ?"
             connection.query(query, {role_id: roleId}, function (err, res) {
                 if (err) throw err;
-                console.log(answer);
                 runSearch();
             })
         })
@@ -375,7 +366,6 @@ function deleteEmployee() {
             let query = "DELETE FROM employee WHERE ?"
             connection.query(query, {employee_id: employeeId}, function (err, res) {
                 if (err) throw err;
-                console.log(answer);
                 runSearch();
             })
         })

@@ -18,7 +18,7 @@ VALUES (24, 'CEO', 180000, 4897), (25, 'Accounts Payable Rep', 45000, 6457), (26
 
 
 INSERT INTO department (department_id, name)
-VALUES (5698, 'IT Services'), (6457, 'Accounting'), (4897, 'Administration'), (3154, 'Marketing'), (1684, 'Human Resources');
+VALUES (5698, 'IT Services'), (6457, 'Accounting'), (4897, 'Administration'), (3154, 'Marketing'), (1684, 'Human Resources'), (6974, 'Training');
 
 
 
