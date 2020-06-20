@@ -46,6 +46,9 @@ function runSearch() {
                 "Add department",
                 "Add role",
                 "Update employee role",
+                "Delete department",
+                "Delete role",
+                "Delete employee",
                 "Quit"
             ]
         })
@@ -72,6 +75,15 @@ function runSearch() {
                     break;
                 case 'Update employee role':
                     updateEmployeeRole();
+                    break;
+                case 'Delete department':
+                    deleteDepartment();
+                    break;
+                case 'Delete role':
+                    deleteRole();
+                    break;
+                case 'Delete employee':
+                    deleteEmployee();
                     break;
                 case 'Quit':
                     connection.end();
@@ -120,7 +132,8 @@ function employeeAdd() {
         .prompt([{
             name: 'employee_id_add',
             type: 'input',
-            message: 'What is the ID for the employee?'
+            message: 'What is the ID for the employee?',
+            validate: employeeIdLength
         },
         {
             name: 'employee_first_name_add',
@@ -166,7 +179,8 @@ function departmentAdd() {
         .prompt([{
             name: 'department_id',
             type: 'input',
-            message: 'What is the department ID?'
+            message: 'What is the department ID?',
+            validate: departmentIdLength
         },
         {
             name: 'name',
@@ -195,7 +209,8 @@ function roleAdd() {
         .prompt([{
             name: 'role_id_add',
             type: 'input',
-            message: 'What is the ID for the role?'
+            message: 'What is the ID for the role?',
+            validate: roleIdLength
         },
         {
             name: 'role_title_add',
@@ -271,4 +286,146 @@ function updateEmployeeRole() {
                 runSearch();
             })
         })
+}
+
+function deleteDepartment() {
+    connection.query("SELECT department_id, name FROM department", function (err, res) {
+        for (let i = 0; i < res.length; i++) {
+            let departmentList = res[i].department_id + ' ' + res[i].name;
+            departmentArr.push(departmentList);
+        }
+    })
+    inquirer
+        .prompt([{
+            name: 'date_record',
+            type: 'input',
+            message: 'What is the effective date of the deletion?',
+            default: "MM/DD/YYYY"
+        },
+        {
+            name: 'department_delete',
+            type: 'list',
+            message: 'What department do you want to delete?',
+            choices: departmentArr
+        }
+        ])
+        .then(function (answer) {
+            let departmentId = answer.department_delete.split(' ').slice(0, 1);
+            let query = "DELETE FROM department WHERE ?"
+            connection.query(query, {department_id: departmentId}, function (err, res) {
+                if (err) throw err;
+                console.log(answer);
+                runSearch();
+            })
+        })
+}
+
+function deleteRole() {
+    connection.query("SELECT role_id, title FROM role", function (err, res) {
+        for (let i = 0; i < res.length; i++) {
+            let roleList = res[i].role_id + ' ' + res[i].title;
+            roleArr.push(roleList);
+        }
+    })
+    inquirer
+        .prompt([{
+            name: 'date_record',
+            type: 'input',
+            message: 'What is the effective date of the deletion?',
+            default: "MM/DD/YYYY"
+        },
+        {
+            name: 'role_delete',
+            type: 'list',
+            message: 'What role do you want to delete?',
+            choices: roleArr
+        }
+        ])
+        .then(function (answer) {
+            let roleId = answer.role_delete.split(' ').slice(0, 1);
+            let query = "DELETE FROM role WHERE ?"
+            connection.query(query, {role_id: roleId}, function (err, res) {
+                if (err) throw err;
+                console.log(answer);
+                runSearch();
+            })
+        })
+}
+
+function deleteEmployee() {
+    connection.query("SELECT employee_id, first_name, last_name FROM employee", function (err, res) {
+        for (let i = 0; i < res.length; i++) {
+            let employeeList = res[i].employee_id + ' ' + res[i].first_name + ' ' + res[i].last_name;
+            employeeArr.push(employeeList);
+        }
+    })
+    inquirer
+        .prompt([{
+            name: 'date_record',
+            type: 'input',
+            message: 'What is the effective date of the deletion?',
+            default: "MM/DD/YYYY"
+        },
+        {
+            name: 'employee_delete',
+            type: 'list',
+            message: 'What employee do you want to delete?',
+            choices: employeeArr
+        }
+        ])
+        .then(function (answer) {
+            let employeeId = answer.employee_delete.split(' ').slice(0, 1);
+            let query = "DELETE FROM employee WHERE ?"
+            connection.query(query, {employee_id: employeeId}, function (err, res) {
+                if (err) throw err;
+                console.log(answer);
+                runSearch();
+            })
+        })
+}
+
+
+
+// Validations
+
+function employeeIdLength(employee_id_add, minlength, maxlength)
+{  	
+   let userInput = employee_id_add;
+   if(userInput.length >= 6 && userInput.length <= 6)
+      {  	
+        return true;  	
+      }
+   else
+      {  	
+	console.log(" Please input 6 numbers");  		
+        return false;  	
+      }  
+}
+
+function departmentIdLength(department_id, minlength, maxlength)
+{  	
+   let userInput = department_id;
+   if(userInput.length >= 4 && userInput.length <= 4)
+      {  	
+        return true;  	
+      }
+   else
+      {  	
+	console.log(" Please input 4 numbers");  		
+        return false;  	
+      }  
+}
+
+function roleIdLength(role_id, minlength, maxlength)
+{  	
+   let userInput = role_id;
+   if(userInput.length >= 2 && userInput.length <= 2)
+      {  	
+        return true;  	
+      }
+   else
+      {  	
+	console.log(" Please input 2 numbers");  		
+        return false;  	
+      }  
 }
