@@ -8,6 +8,8 @@ require('dotenv').config();
 let employeeArr = [];
 let roleArr = [];
 let departmentArr = [];
+let employeeArrTwo = [];
+let roleArrTwo = [];
 
 let connection = mysql.createConnection({
     host: 'localhost',
@@ -227,8 +229,26 @@ function roleAdd() {
 }
 
 function updateEmployeeRole() {
+    connection.query("SELECT employee_id, first_name, last_name FROM employee", function (err, res) {
+        for (let i = 0; i < res.length; i++) {
+            let employeeList = res[i].employee_id + ' ' + res[i].first_name + ' ' + res[i].last_name;
+            employeeArr.push(employeeList);
+        }
+    })
+    connectionTwo.query("SELECT role_id, title FROM role", function (err, res) {
+        for (let i = 0; i < res.length; i++) {
+            let roleList = res[i].role_id + ' ' + res[i].title;
+            roleArr.push(roleList);
+        }
+    })
     inquirer
         .prompt([{
+            name: 'change_date',
+            type: 'list',
+            message: 'Is this a recent change?',
+            choices: ['Yes', 'No']
+        },
+        {
             name: 'employee_role_update',
             type: 'list',
             message: 'Whose role do you wish to update?',
@@ -240,9 +260,15 @@ function updateEmployeeRole() {
             message: 'What is their new role?',
             choices: roleArr
         }
-    ])
-    .then(function(err, res) {
-        let employee = answer.employee_role_update;
-        console.log(employee);
-    })
+        ])
+        .then(function (answer) {
+            let employeeToChange = answer.employee_role_update.split(' ').slice(0, 1);
+            console.log(employeeToChange)
+            let newRole = answer.employee_role_change.split(' ').slice(0, 1);
+            let query = "UPDATE employee SET ? WHERE ?";
+            connection.query(query, [{role_id: newRole}, {employee_id: employeeToChange}], function (err, res) {
+                if (err) throw err;
+                runSearch();
+            })
+        })
 }
