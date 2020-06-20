@@ -1,6 +1,3 @@
-const Employee = require('./lib/Employee');
-const Role = require('./lib/Role');
-const Department = require('./lib/Department');
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 require('dotenv').config();
